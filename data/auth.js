@@ -21,15 +21,7 @@ export function register(user) {
 }
 
 export function getUserProfile() {
-  return fetchWithResponse('profile', {
-    headers: {
-      Authorization: `Token ${localStorage.getItem('token')}`,
-    }
-  })
-}
-
-export function getCustomerList() {
-  return fetchWithResponse('customers', {
+  return fetchWithResponse('users', {
     headers: {
       Authorization: `Token ${localStorage.getItem('token')}`,
     }

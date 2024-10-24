@@ -10,42 +10,52 @@ const checkError = (res) => {
 const checkErrorJson = async (res) => {
   const data = await res.json().catch((err) => {
     console.error("Failed to parse JSON:", err);
-    return {}; // Return empty object if parsing fails
+    return {};
   });
 
   if (!res.ok) {
-    console.error("Error Response:", data);
-
-    // Extract the error messages for specific fields, like 'price'
-    const errorMessage = data.price
-      ? data.price.join(" ")
-      : data.message || `Error: ${res.status}`;
+    const errorMessage = data.message || `Error: ${res.status}`;
     throw new Error(errorMessage);
   }
 
   return data;
 };
 
-const catchError = (err) => {
-  if (err.message === "401") {
-    window.location.href = "/login";
-  }
-  if (err.message === "404") {
-    throw Error(err.message);
-  }
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Token ${token}` } : {};
 };
 
-export const fetchWithResponse = async (resource, options) => {
+export const fetchWithResponse = async (resource, options = {}) => {
   try {
-    const response = await fetch(`${API_URL}/${resource}`, options);
+    const response = await fetch(`${API_URL}/${resource}`, {
+      ...options,
+      headers: {
+        ...getAuthHeaders(),
+        ...options.headers,
+      },
+    });
     return await checkErrorJson(response);
   } catch (error) {
     if (error.message === "401") {
       window.location.href = "/login";
     }
-    throw error; // Re-throw the error for the component to handle
+    throw error;
   }
 };
 
-export const fetchWithoutResponse = (resource, options) =>
-  fetch(`${API_URL}/${resource}`, options).then(checkError).catch(catchError);
+export const fetchWithoutResponse = (resource, options = {}) =>
+  fetch(`${API_URL}/${resource}`, {
+    ...options,
+    headers: {
+      ...getAuthHeaders(),
+      ...options.headers,
+    },
+  })
+    .then(checkError)
+    .catch((err) => {
+      if (err.message === "401") {
+        window.location.href = "/login";
+      }
+      throw err;
+    });

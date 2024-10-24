@@ -1,0 +1,24 @@
+/* styles/workshop.css */
+.workshop-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .current-workout {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 100%;
+  }
+  
+  .current-workout ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .button {
+    margin: 10px;
+  }
+  
