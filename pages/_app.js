@@ -2,7 +2,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import '../styles/globals.css';
-import '../styles/workshop.css'
+import '../styles/workshop.css';
+
 
 const queryClient = new QueryClient();
 

@@ -31,7 +31,8 @@ export default function Navbar() {
     <nav className="navbar">
       <ul className="navbar-links">
         <li>
-          <Link href="/">Home</Link>
+          <Link href="/">Home </Link>
+          <Link href="/workshop">  Workout Workshop  </Link>
         </li>
         {/* Show logout button only if the user is logged in */}
         {isLoggedIn && (
