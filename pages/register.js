@@ -3,8 +3,6 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Input } from "../components/form-elements";
-import Layout from "../components/layout";
-import Navbar from "../components/navbar";
 import { register } from "../data/auth";
 import { useUserQuery } from "../context/userQueries";
 

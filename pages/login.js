@@ -6,7 +6,6 @@ import { login } from "../data/auth";
 import { useUserQuery } from "../context/userQueries";
 import { useMutation } from "@tanstack/react-query";
 
-
 export default function Login() {
   const { setUserToken } = useUserQuery();
   const username = useRef("");
@@ -17,7 +16,7 @@ export default function Login() {
     mutationFn: login,
     onSuccess: (data) => {
       if (data.token) {
-        setUserToken(data.token); // update the query state
+        setUserToken(data.token); // Automatically handle token
         router.push("/");
       }
     },
@@ -35,24 +34,21 @@ export default function Login() {
   return (
     <div className="columns is-centered">
       <div className="column is-half">
-        <form className="box">
+        <form className="box" onSubmit={submit}>
           <h1 className="title">Welcome Back!</h1>
           <Input id="username" refEl={username} type="text" label="Username" />
-          <Input
-            id="password"
-            refEl={password}
-            type="password"
-            label="Password"
-          />
+          <Input id="password" refEl={password} type="password" label="Password" />
           <div className="field is-grouped">
             <div className="control">
-              <button className="button is-link" onClick={submit}>
+              <button className="button is-link" type="submit">
                 Login
               </button>
             </div>
             <div className="control">
               <Link href="/register">
-                <button className="button is-link is-light">Register</button>
+                <button className="button is-link is-light" type="button">
+                  Register
+                </button>
               </Link>
             </div>
           </div>
