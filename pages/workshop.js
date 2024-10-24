@@ -1,91 +1,106 @@
 import { useState, useEffect, useRef } from "react";
 import { Input, Select } from "../components/form-elements";
-import { getExerciseCategories, getExercisesByCategory, createWorkout } from "../data/workouts";
+import { getCategories, getExercisesByCategory, createWorkout } from "../data/workouts";
 import Navbar from "@/components/Navbar";
 
 export default function Workshop() {
+  // State management for form inputs and selections
   const [targetDate, setTargetDate] = useState("");
   const [workoutCategory, setWorkoutCategory] = useState(null);
-  const [exerciseCategories, setExerciseCategories] = useState([]);
-  const [currentCategory, setCurrentCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [selectedExercises, setSelectedExercises] = useState([]);
-  const [showAddExercise, setShowAddExercise] = useState(false);
 
   const categoryRef = useRef();
   const exerciseRef = useRef();
 
-  // Fetch exercise categories on load
+  // Fetch the categories on load
   useEffect(() => {
-    getExerciseCategories().then(setExerciseCategories);
+    getCategories().then(setCategories);
   }, []);
 
   // Fetch exercises when a category is selected
   useEffect(() => {
-    if (currentCategory) {
-      getExercisesByCategory(currentCategory).then(setExercises);
+    if (workoutCategory) {
+      getExercisesByCategory(workoutCategory).then(setExercises);
     }
-  }, [currentCategory]);
+  }, [workoutCategory]);
 
+  // Add selected exercise to the current workout
   const handleAddExercise = () => {
     const selectedExerciseId = parseInt(exerciseRef.current.value);
     const selectedExercise = exercises.find(ex => ex.id === selectedExerciseId);
-    
+
     if (selectedExercise && !selectedExercises.includes(selectedExercise)) {
       setSelectedExercises([...selectedExercises, selectedExercise]);
     }
   };
 
+  // Handle form submission and send workout to the API
   const handleSubmitWorkout = async () => {
+    if (!targetDate || !workoutCategory || selectedExercises.length === 0) {
+      alert("Please complete all fields before saving the workout.");
+      return;
+    }
+
     const payload = {
       target_date: targetDate,
-      category: workoutCategory,  // category id for WorkoutCategory
-      exercises: selectedExercises.map(ex => ex.id),  // exercise ids for the Workout
+      category: workoutCategory,
+      exercises: selectedExercises.map(ex => ex.id),
     };
-  
+
     try {
-      await createWorkout(payload);  // This API will handle creating both the workout and workout_category
+      await createWorkout(payload);  // API call to create the workout
       alert("Workout created successfully!");
-      // Reset form or redirect as needed
+      resetForm(); // Clear form after successful submission
     } catch (error) {
       console.error("Failed to create workout:", error);
       alert("Failed to create workout.");
     }
   };
 
+  // Reset form to allow for new workout creation
+  const resetForm = () => {
+    setTargetDate("");
+    setWorkoutCategory(null);
+    setSelectedExercises([]);
+    setExercises([]);
+    categoryRef.current.value = "0"; // Reset category dropdown
+  };
+
   return (
-    <><Navbar />
+    <>
+    <Navbar />
     <div className="workshop-container">
-      <h1>Workout Builder</h1>
+      {/* Left side: Workout Builder Form */}
+      <div className="workout-form card">
+        <h1>Workout Builder</h1>
+        
+        {/* Date Picker */}
+        <Input
+          id="target-date"
+          type="date"
+          label="Target Date"
+          value={targetDate}
+          onChangeEvent={(e) => setTargetDate(e.target.value)}
+        />
 
-      {/* Select target date */}
-      <Input
-        id="target-date"
-        type="date"
-        label="Target Date"
-        onChangeEvent={(e) => {
-          setTargetDate(e.target.value);
-          setShowAddExercise(true);
-        }}
-      />
+        {/* Category Dropdown */}
+        <Select
+          id="workout-category"
+          refEl={categoryRef}
+          options={categories.map((category) => ({
+            id: category.id,
+            name: category.label, // Display the category label correctly
+          }))}
+          title="Select Category"
+          label="Workout Category"
+          onChangeEvent={(e) => setWorkoutCategory(parseInt(e.target.value))}
+        />
 
-      {/* Add Exercise Button */}
-      {showAddExercise && (
-        <>
-          <button onClick={() => setShowAddExercise(true)} className="button is-primary">Add Exercise</button>
-
-          {/* Category Dropdown */}
-          <Select
-            id="category"
-            refEl={categoryRef}
-            options={exerciseCategories}
-            title="Select Category"
-            label="Exercise Category"
-            onChangeEvent={(e) => setCurrentCategory(parseInt(e.target.value))}
-          />
-
-          {/* Exercise Dropdown */}
-          {currentCategory && (
+        {/* Add Exercise Button */}
+        {workoutCategory && (
+          <>
             <Select
               id="exercise"
               refEl={exerciseRef}
@@ -93,43 +108,37 @@ export default function Workshop() {
               title="Select Exercise"
               label="Exercise"
             />
-          )}
+            <button onClick={handleAddExercise} className="button is-link">
+              Add Exercise
+            </button>
+          </>
+        )}
+      </div>
 
-          <button onClick={handleAddExercise} className="button is-link">
-            Add to Workout
-          </button>
-        </>
-      )}
+      {/* Right side: Current Workout Card */}
+      <div className="current-workout card">
+        <h2>Current Workout</h2>
+        <p><strong>Target Date:</strong> {targetDate || "Not selected"}</p>
+        <p><strong>Category:</strong> {workoutCategory ? categories.find(cat => cat.id === workoutCategory)?.label : "Not selected"}</p>
 
-      {/* Current Workout */}
-      {selectedExercises.length > 0 && (
-        <div className="current-workout">
-          <h2>Current Workout</h2>
-          <p>Target Date: {targetDate}</p>
-
-          <ul>
-            {selectedExercises.map((exercise) => (
+        <ul>
+          {selectedExercises.length === 0 ? (
+            <li>No exercises added yet.</li>
+          ) : (
+            selectedExercises.map((exercise) => (
               <li key={exercise.id}>
                 <strong>{exercise.name}</strong>: {exercise.description}
               </li>
-            ))}
-          </ul>
+            ))
+          )}
+        </ul>
 
-          {/* Select Category for Workout */}
-          <Select
-            id="workout-category"
-            refEl={categoryRef}
-            options={exerciseCategories}
-            title="Select Workout Category"
-            label="Workout Category"
-            onChangeEvent={(e) => setWorkoutCategory(parseInt(e.target.value))}
-          />
-
-          <button onClick={handleSubmitWorkout} className="button is-success">
+        {selectedExercises.length > 0 && (
+          <button onClick={handleSubmitWorkout} className="button is-success mt-4">
             Save Workout
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div></>
   );
 }

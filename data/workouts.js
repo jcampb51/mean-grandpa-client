@@ -19,8 +19,9 @@ export function getWorkoutLogs(workoutId) {
   });
 }
 
-export async function getExerciseCategories() {
-  const categories = await fetchWithResponse("exercise-categories", {
+// Fetch categories
+export async function getCategories() {
+  const categories = await fetchWithResponse("categories", {
     headers: {
       Authorization: `Token ${localStorage.getItem("token")}`,
     },
@@ -28,15 +29,17 @@ export async function getExerciseCategories() {
   return categories;
 }
 
+// Fetch exercises by category id
 export async function getExercisesByCategory(categoryId) {
-  const exerciseCategories = await fetchWithResponse(`exercise-categories?category=${categoryId}`, {
+  const exercises = await fetchWithResponse(`exercises?category=${categoryId}`, {
     headers: {
       Authorization: `Token ${localStorage.getItem("token")}`,
     },
   });
-  return exerciseCategories.map(exerciseCategory => exerciseCategory.exercise);
+  return exercises;
 }
 
+// Create a new workout
 export async function createWorkout(payload) {
   return fetchWithResponse("workouts", {
     method: "POST",
