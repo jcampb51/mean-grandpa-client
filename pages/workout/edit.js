@@ -4,6 +4,7 @@ import { Input, Select } from "../../components/form-elements";
 import { getCategories, getExercisesByCategory, getWorkoutDetails, updateWorkout } from "../../data/workouts";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/router";
+import DeleteWorkoutButton from "@/components/DeleteWorkoutButton";
 
 export default function WorkoutEdit() {
   const [targetDate, setTargetDate] = useState("");
@@ -162,6 +163,7 @@ export default function WorkoutEdit() {
           <button onClick={handleSaveChanges} className="button is-success mt-4">
             Save Changes
           </button>
+          <DeleteWorkoutButton workoutId={workoutId} />
         </div>
       </div>
     </>
