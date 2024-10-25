@@ -10,6 +10,7 @@ import {
   completeWorkout, 
   getIncompleteWorkouts 
 } from '../../data/workouts';
+import DeleteWorkoutButton from '@/components/DeleteWorkoutButton';
 
 export default function WorkoutPage() {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState(null);
@@ -184,6 +185,7 @@ export default function WorkoutPage() {
 
               {/* Use EditWorkoutButton component */}
               <EditWorkoutButton workoutId={selectedWorkoutId} />
+              <DeleteWorkoutButton workoutId={selectedWorkoutId} />
             </>
           ) : (
             <p>No workout data available.</p>

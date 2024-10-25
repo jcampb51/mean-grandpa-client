@@ -104,3 +104,13 @@ export async function updateWorkout(workoutId, payload) {
     body: JSON.stringify(payload),
   });
 }
+
+// Delete a workout by ID
+export async function deleteWorkout(workoutId) {
+  return fetchWithResponse(`workouts/${workoutId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+  });
+}
