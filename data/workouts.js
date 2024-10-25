@@ -83,3 +83,24 @@ export async function getIncompleteWorkouts() {
     },
   });
 }
+
+// Fetch details of a specific workout by ID
+export function getWorkoutDetails(workoutId) {
+  return fetchWithResponse(`workouts/${workoutId}`, {
+    headers: {
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+  });
+}
+
+// Update an existing workout by ID
+export async function updateWorkout(workoutId, payload) {
+  return fetchWithResponse(`workouts/${workoutId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(payload),
+  });
+}
