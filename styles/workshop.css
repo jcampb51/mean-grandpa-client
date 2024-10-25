@@ -22,3 +22,20 @@
     margin: 10px;
   }
   
+  .workout-page-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .workout-selector {
+    width: 30%;
+  }
+  
+  .workout-display {
+    width: 65%;
+  }
+  
+  .log-item {
+    margin-bottom: 20px;
+  }

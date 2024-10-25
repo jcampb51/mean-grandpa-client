@@ -51,7 +51,7 @@ export default function HomePage() {
       <Navbar />
       
       <div className="workout-container">
-        <h2>{nextWorkout?.category?.label} Workout</h2>
+        <h2>{nextWorkout?.category?.label} Your Next Workout</h2>
         <ul>
           {nextWorkout.exercises.map((exercise) => (
             <li key={exercise.id}>
@@ -60,7 +60,7 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
-        <Link href={`/workout-tracker/${nextWorkout.id}`}>
+        <Link href={`/workout`}>
           <button className="button">View in Tracker</button>
         </Link>
       </div>

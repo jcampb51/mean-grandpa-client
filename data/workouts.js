@@ -50,3 +50,36 @@ export async function createWorkout(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+// Update a specific log
+export async function updateLog({ logId, updatedLog }) {
+  return fetchWithResponse(`logs/${logId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(updatedLog),
+  });
+}
+
+// Mark workout as complete
+export async function completeWorkout(workoutId) {
+  return fetchWithResponse(`workouts/${workoutId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify({ completed: true }),
+  });
+}
+
+// Get a list of incomplete workouts
+export async function getIncompleteWorkouts() {
+  return fetchWithResponse('workouts?completed=false', {
+    headers: {
+      Authorization: `Token ${localStorage.getItem('token')}`,
+    },
+  });
+}
