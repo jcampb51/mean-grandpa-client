@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '../../components/form-elements';
 import Navbar from '@/components/Navbar';
+import EditWorkoutButton from '@/components/EditWorkoutButton';
 import { useRouter } from 'next/router';
 import { 
   getNextScheduledWorkout, 
@@ -180,6 +181,9 @@ export default function WorkoutPage() {
               <button className="button is-success mt-4" onClick={handleCompleteWorkout}>
                 Complete Workout
               </button>
+
+              {/* Use EditWorkoutButton component */}
+              <EditWorkoutButton workoutId={selectedWorkoutId} />
             </>
           ) : (
             <p>No workout data available.</p>
