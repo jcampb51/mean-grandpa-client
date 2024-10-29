@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '../../components/form-elements';
 import Navbar from '@/components/Navbar';
 import EditWorkoutButton from '@/components/EditWorkoutButton';
+import DeleteWorkoutButton from '@/components/DeleteWorkoutButton';
 import { useRouter } from 'next/router';
 import { 
   getNextScheduledWorkout, 
@@ -10,7 +11,7 @@ import {
   completeWorkout, 
   getIncompleteWorkouts 
 } from '../../data/workouts';
-import DeleteWorkoutButton from '@/components/DeleteWorkoutButton';
+import { useUserQuery } from '@/context/userQueries'; 
 
 export default function WorkoutPage() {
   const [selectedWorkoutId, setSelectedWorkoutId] = useState(null);
@@ -19,10 +20,10 @@ export default function WorkoutPage() {
   const [workoutsList, setWorkoutsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { isStaff } = useUserQuery();
 
-  // Fetch next workout and incomplete workouts on initial load
   useEffect(() => {
-    const fetchWorkoutsData = async () => {
+    async function fetchWorkoutsData() {
       try {
         const nextWorkoutData = await getNextScheduledWorkout();
         setNextWorkout(nextWorkoutData);
@@ -35,32 +36,27 @@ export default function WorkoutPage() {
       } finally {
         setLoading(false);
       }
-    };
-
+    }
     fetchWorkoutsData();
   }, []);
 
-  // Fetch logs when the selected workout ID changes
   useEffect(() => {
-    if (selectedWorkoutId) {
-      const fetchWorkoutLogs = async () => {
+    async function fetchWorkoutLogs() {
+      if (selectedWorkoutId) {
         try {
           const logsData = await getWorkoutLogs(selectedWorkoutId);
           setWorkoutLogs(logsData);
         } catch (error) {
           console.error('Error fetching workout logs:', error);
         }
-      };
-
-      fetchWorkoutLogs();
+      }
     }
+    fetchWorkoutLogs();
   }, [selectedWorkoutId]);
 
-  // Function to update a log
   const handleSaveLog = async (logId, updatedLog) => {
     try {
       await updateLog({ logId, updatedLog });
-      // Refresh logs to reflect any changes
       const logsData = await getWorkoutLogs(selectedWorkoutId);
       setWorkoutLogs(logsData);
     } catch (error) {
@@ -68,11 +64,10 @@ export default function WorkoutPage() {
     }
   };
 
-  // Function to mark workout as complete
   const handleCompleteWorkout = async () => {
     try {
       await completeWorkout(selectedWorkoutId);
-      router.push('/'); // Redirect to home after marking workout complete
+      router.push('/'); 
     } catch (error) {
       console.error('Error completing workout:', error);
     }
@@ -86,7 +81,6 @@ export default function WorkoutPage() {
     <>
       <Navbar />
       <div className="workout-page-container">
-        {/* Left: Workout Selector */}
         <div className="workout-selector">
           <h2>Select a Different Workout</h2>
           <select
@@ -102,7 +96,6 @@ export default function WorkoutPage() {
           </select>
         </div>
 
-        {/* Right: Workout Display */}
         <div className="workout-display">
           {nextWorkout && nextWorkout.categories?.length > 0 ? (
             <>
@@ -183,7 +176,6 @@ export default function WorkoutPage() {
                 Complete Workout
               </button>
 
-              {/* Use EditWorkoutButton component */}
               <EditWorkoutButton workoutId={selectedWorkoutId} />
               <DeleteWorkoutButton workoutId={selectedWorkoutId} />
             </>

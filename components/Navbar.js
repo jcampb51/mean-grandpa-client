@@ -19,6 +19,7 @@ export default function Navbar() {
   const handleLogout = () => {
     // Remove the token from local storage
     localStorage.removeItem('token');
+    localStorage.removeItem('is_staff');
     
     // Navigate to login page
     router.push('/login');

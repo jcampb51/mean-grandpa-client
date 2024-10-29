@@ -1,34 +1,41 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Input } from "../components/form-elements";
 import { login } from "../data/auth";
 import { useUserQuery } from "../context/userQueries";
-import { useMutation } from "@tanstack/react-query";
 
 export default function Login() {
   const { setUserToken } = useUserQuery();
   const username = useRef("");
   const password = useRef("");
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const loginMutation = useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      if (data.token) {
-        setUserToken(data.token); // Automatically handle token
-        router.push("/");
-      }
-    },
-  });
-
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
     const user = {
       username: username.current.value,
       password: password.current.value,
     };
-    loginMutation.mutate(user);
+
+    try {
+      const data = await login(user);
+      if (data.token) {
+        // Store both token and is_staff status
+        setUserToken(data.token, data.is_staff);
+        router.push("/");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,9 +45,10 @@ export default function Login() {
           <h1 className="title">Welcome Back!</h1>
           <Input id="username" refEl={username} type="text" label="Username" />
           <Input id="password" refEl={password} type="password" label="Password" />
+          {error && <p className="help is-danger">{error}</p>}
           <div className="field is-grouped">
             <div className="control">
-              <button className="button is-link" type="submit">
+              <button className={`button is-link ${isLoading ? "is-loading" : ""}`} type="submit" disabled={isLoading}>
                 Login
               </button>
             </div>

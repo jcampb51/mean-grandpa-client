@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { Input } from "../components/form-elements";
 import { register } from "../data/auth";
 import { useUserQuery } from "../context/userQueries";
@@ -16,19 +15,13 @@ export default function Register() {
   const address = useRef("");
   const phoneNumber = useRef("");
   const password = useRef("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const registerMutation = useMutation({
-    mutationFn: register,
-    onSuccess: (data) => {
-      if (data.token) {
-        setUserToken(data.token);
-        router.push("/");
-      }
-    },
-  });
-
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     const user = {
       username: username.current.value,
@@ -40,7 +33,18 @@ export default function Register() {
       phone_number: phoneNumber.current.value,
     };
 
-    registerMutation.mutate(user);
+    try {
+      const data = await register(user);
+      if (data.token) {
+        setUserToken(data.token);
+        router.push("/");
+      }
+    } catch (err) {
+      setError("Registration failed. Please try again.");
+      console.error("Registration error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,43 +52,20 @@ export default function Register() {
       <div className="column is-half">
         <form className="box" onSubmit={submit}>
           <h1 className="title">Welcome!</h1>
-          <Input
-            id="firstName"
-            refEl={firstName}
-            type="text"
-            label="First Name"
-          />
+          <Input id="firstName" refEl={firstName} type="text" label="First Name" />
           <Input id="lastName" refEl={lastName} type="text" label="Last Name" />
           <Input id="username" refEl={username} type="text" label="Username" />
           <Input id="email" refEl={email} type="email" label="Email" />
           <Input id="address" refEl={address} type="text" label="Address" />
-          <Input
-            id="phone_number"
-            refEl={phoneNumber}
-            type="tel"
-            label="Phone Number"
-          />
-          <Input
-            id="password"
-            refEl={password}
-            type="password"
-            label="Password"
-          />
-
-          {registerMutation.isError && (
-            <p className="help is-danger">
-              Registration failed. Please try again.
-            </p>
-          )}
-
+          <Input id="phone_number" refEl={phoneNumber} type="tel" label="Phone Number" />
+          <Input id="password" refEl={password} type="password" label="Password" />
+          {error && <p className="help is-danger">{error}</p>}
           <div className="field is-grouped">
             <div className="control">
               <button
                 type="submit"
-                className={`button is-link ${
-                  registerMutation.isPending ? "is-loading" : ""
-                }`}
-                disabled={registerMutation.isPending}
+                className={`button is-link ${isLoading ? "is-loading" : ""}`}
+                disabled={isLoading}
               >
                 Submit
               </button>
