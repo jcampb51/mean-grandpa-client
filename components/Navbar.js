@@ -35,6 +35,7 @@ export default function Navbar() {
           <Link href="/">Home </Link>
           <Link href="/workout">   Workout Tracker   </Link>
           <Link href="/workshop">  Workout Workshop  </Link>
+          <Link href="/featured">Mean Grandpa's Workouts</Link>
         </li>
         {/* Show logout button only if the user is logged in */}
         {isLoggedIn && (
