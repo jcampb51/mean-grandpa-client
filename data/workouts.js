@@ -114,3 +114,40 @@ export async function deleteWorkout(workoutId) {
     },
   });
 }
+
+export function createFeaturedWorkout(featuredWorkoutData) {
+  return fetchWithResponse("featured_workouts", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(featuredWorkoutData),
+  });
+}
+
+// Update an existing featured workout
+export function updateFeaturedWorkout(id, featuredWorkoutData) {
+  return fetchWithResponse(`featured_workouts/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Token ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(featuredWorkoutData),
+  });
+}
+
+export async function getFeaturedWorkouts({ split, current }) {
+  return fetchWithResponse(`featured_workouts?split=${split}&current=${current}`);
+}
+
+// Add workout to user's workout list
+export async function addWorkoutCopy(workoutId) {
+  return fetchWithResponse(`workouts/${workoutId}/copy_workout`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${localStorage.getItem("token")}`,
+    },
+  });
+}
